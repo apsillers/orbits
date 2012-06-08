@@ -243,25 +243,26 @@ function worldLoop() {
 			s.gfx.y += s.dy;
 		}
 
+        var hasBounced = false;
         for(var j=0; j < blocks.length; ++j) {
-    		if(diffX + s.gfx.x > canvas.width) {
-			    s.gfx.x = 2*canvas.width - (s.gfx.x + diffX);
+		    if(s.dx + s.gfx.x > canvas.width) {
+			    s.gfx.x = 2*canvas.width - (s.gfx.x + s.dx);
 			    s.dx *= -1;
-		    } else if(diffX + s.gfx.x < 0) {
-			    s.gfx.x = -(s.gfx.x + diffX);
+		    } else if(s.dx + s.gfx.x < 0) {
+			    s.gfx.x = -(s.gfx.x + s.dx);
 			    s.dx *= -1;
 		    } else {
-			    s.gfx.x += diffX;
+			    s.gfx.x += s.dx;
 		    }
 
-		    if(diffY + s.gfx.y > canvas.height) {
-			    s.gfx.y = 2*canvas.height - (s.gfx.y + diffY);
+		    if(s.dy + s.gfx.y > canvas.height) {
+			    s.gfx.y = 2*canvas.height - (s.gfx.y + s.dy);
 			    s.dy *= -1;
-		    } else if(diffY + s.gfx.y < 0) {
-			    s.gfx.y = -(s.gfx.y + diffY);
+		    } else if(s.dy + s.gfx.y < 0) {
+			    s.gfx.y = -(s.gfx.y + s.dy);
 			    s.dy *= -1;
 		    } else {
-			    s.gfx.y += diffY;
+			    s.gfx.y += s.dy;
 		    }
         }
 
