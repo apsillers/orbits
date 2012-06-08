@@ -33,7 +33,7 @@ function doBounces(shot, blocks, canvas_height, canvas_width) {
                     hasBounced = true;
                 }
             } else {
-                if(s.gfx.y <= block.gfx.y || s.gfx.y >= block.gfx.y + block.gfx.height	) {
+                if(s.gfx.y <= block.gfx.y || s.gfx.y >= block.gfx.y + block.gfx.height    ) {
                     // the short started directly below the block
                     if(started_above) { s.gfx.y = 2*block.gfx.y - (s.gfx.y + s.dy); }
                     else { s.gfx.y = 2*(block.gfx.y+block.gfx.height) - (s.gfx.y + s.dy); }
@@ -53,27 +53,27 @@ function doBounces(shot, blocks, canvas_height, canvas_width) {
 
     // move shots; bounce shots off walls if out of bounds
     if(s.dx + s.gfx.x > canvas_width) {
-	    s.gfx.x = 2*canvas_width - (s.gfx.x + s.dx);
-	    s.dx *= -1;
+        s.gfx.x = 2*canvas_width - (s.gfx.x + s.dx);
+        s.dx *= -1;
         hasBounced = true;
     } else if(s.dx + s.gfx.x < 0) {
-	    s.gfx.x = -(s.gfx.x + s.dx);
-	    s.dx *= -1;
+        s.gfx.x = -(s.gfx.x + s.dx);
+        s.dx *= -1;
         hasBounced = true;
     } else {
-	    s.gfx.x += s.dx;
+        s.gfx.x += s.dx;
     }
 
     if(s.dy + s.gfx.y > canvas_height) {
-	    s.gfx.y = 2*canvas_height - (s.gfx.y + s.dy);
-	    s.dy *= -1;
+        s.gfx.y = 2*canvas_height - (s.gfx.y + s.dy);
+        s.dy *= -1;
         hasBounced = true;
     } else if(s.dy + s.gfx.y < 0) {
-	    s.gfx.y = -(s.gfx.y + s.dy);
-	    s.dy *= -1;
+        s.gfx.y = -(s.gfx.y + s.dy);
+        s.dy *= -1;
         hasBounced = true;
     } else {
-	    s.gfx.y += s.dy;
+        s.gfx.y += s.dy;
     }
 
     return hasBounced;
