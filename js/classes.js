@@ -121,6 +121,9 @@ function Block(options) {
     this.gfx.x = options.x;
     this.gfx.y = options.y;
     this.gfx.fill = options.color || "red";
+    this.hp = options.hp || 0;
+
+    this.hit = function(dx, dy) { if(this.hp == 1) this.remove(); else if(this.hp > 0) this.hp--; }
 
     canvas.append(this.gfx);
     blocks.push(this);

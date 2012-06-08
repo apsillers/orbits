@@ -152,7 +152,14 @@ function init() {
 
     addPlayButton(canvas);
 
-    setupCourse();
+    if(window.location.hash) {
+        try {
+            loadState(atob(window.location.hash.substr(1)));
+        } catch(e) {
+           setupCourse(); 
+        }
+    }
+    else { setupCourse(); }
 }
 
 // used at the beginning of click handlers to stop default click behaviors
@@ -259,17 +266,22 @@ function worldLoop() {
 }
 
 function setupCourse() {
-    new Target({color:"red", x:100, y:160, text:"RvGr", properties:{gravReaction:-1}});
-    new Target({color:"orange", x:200, y:100, text:"LoGr", properties:{gravReaction:0.25}});
-    new Target({color:"blue", x:600, y:100, text:"LoSp",  properties:{speedFactor:0.5, smallSlowdown:5}});
-    new Target({color:"#5F5", x:700, y:160, text:"HiSp", properties:{speedFactor:2, smallSpeedup:5}});
-    new Target({color:"yellow", x:600, y:400, text:"HiGr", properties:{gravReaction:4, edible:false}});
-    new Target({color:"#F55", x:400, y:300, text:"MkGr",  properties:{gravPull:50, radius:3}, radius:27});
+    //new Target({color:"red", x:100, y:160, text:"RvGr", properties:{gravReaction:-1}});
+    //new Target({color:"orange", x:200, y:100, text:"LoGr", properties:{gravReaction:0.25}});
+    //new Target({color:"blue", x:600, y:100, text:"LoSp",  properties:{speedFactor:0.5, smallSlowdown:5}});
+    //new Target({color:"#5F5", x:700, y:160, text:"HiSp", properties:{speedFactor:2, smallSpeedup:5}});
+    //new Target({color:"yellow", x:600, y:400, text:"HiGr", properties:{gravReaction:4, edible:false}});
+    //new Target({color:"#F55", x:400, y:300, text:"MkGr",  properties:{gravPull:50, radius:3}, radius:27});
 
-    new Block({color:"#AAA", x:600, y:525})
-    new Block({color:"#999", x:100, y:300})
+    new Block({color:"#AAA", x:600, y:525});
+    for(var i = 0; i < 10; ++i) {
+        for(var j = 0; j < 10; ++j) {
+            new Block({color:"#D"+i+""+j, x:52*i+130, y:22*j+70, width:50, height: 20, hp:1});
+        }
+    }
+    
 
-    new Emitter({ rotation:0, x:50, y:550, shotDx: 1 });
+    new Emitter({ rotation:Math.PI/2, x:50, y:50, shotDx: 1 });
 }
 
 function distVector(obj1, obj2, log) {

@@ -22,28 +22,28 @@ function doBounces(shot, blocks, canvas_height, canvas_width) {
                 // the y-boundary, we have entered from the right or left
                 // side, not the top or bottom
                 if(s.gfx.y + partial_dy > block.gfx.y && s.gfx.y + partial_dy < block.gfx.y +  block.gfx.height) {
-                    if(started_left) { s.gfx.x = 2*block.gfx.x - (s.gfx.x + s.dx); }
-                    else { s.gfx.x = 2*(block.gfx.x+block.gfx.width) - (s.gfx.x + s.dx); }
+                    if(started_left) { s.gfx.x = 2*block.gfx.x - (s.gfx.x + s.dx); block.hit(1,0); }
+                    else { s.gfx.x = 2*(block.gfx.x+block.gfx.width) - (s.gfx.x + s.dx); block.hit(-1,0); }
                     s.dx *= -1;
                     hasBounced = true;
                 } else {
-                    if(started_above) { s.gfx.y = 2*block.gfx.y - (s.gfx.y + s.dy); }
-                    else { s.gfx.y = 2*(block.gfx.y+block.gfx.height) - (s.gfx.y + s.dy); }
+                    if(started_above) { s.gfx.y = 2*block.gfx.y - (s.gfx.y + s.dy); block.hit(0,1); }
+                    else { s.gfx.y = 2*(block.gfx.y+block.gfx.height) - (s.gfx.y + s.dy); block.hit(0,-1); }
                     s.dy *= -1;
                     hasBounced = true;
                 }
             } else {
                 if(s.gfx.y <= block.gfx.y || s.gfx.y >= block.gfx.y + block.gfx.height    ) {
                     // the short started directly below the block
-                    if(started_above) { s.gfx.y = 2*block.gfx.y - (s.gfx.y + s.dy); }
-                    else { s.gfx.y = 2*(block.gfx.y+block.gfx.height) - (s.gfx.y + s.dy); }
+                    if(started_above) { s.gfx.y = 2*block.gfx.y - (s.gfx.y + s.dy); block.hit(0,1); }
+                    else { s.gfx.y = 2*(block.gfx.y+block.gfx.height) - (s.gfx.y + s.dy); block.hit(0,-1); }
                     s.dy *= -1;
                     hasBounced = true;
                 } else {
                     // TODO: the shot started inside the block
                     // (this should never happen, but may if, e.g., the block was dragged over the shot)
-                    if(started_left) { s.gfx.x = 2*block.gfx.x - (s.gfx.x + s.dx); }
-                    else { s.gfx.x = 2*(block.gfx.x+block.gfx.width) - (s.gfx.x + s.dx); }
+                    if(started_left) { s.gfx.x = 2*block.gfx.x - (s.gfx.x + s.dx); block.hit(1,0); }
+                    else { s.gfx.x = 2*(block.gfx.x+block.gfx.width) - (s.gfx.x + s.dx); block.hit(-1,0); }
                     s.dx *= -1;
                     hasBounced = true;
                 }
@@ -74,6 +74,11 @@ function doBounces(shot, blocks, canvas_height, canvas_width) {
         hasBounced = true;
     } else {
         s.gfx.y += s.dy;
+    }
+
+    // if the shot is still out of bounds after the bounce, give up
+    if(s.dx + s.gfx.x > canvas_width || s.dx + s.gfx.x < 0 || s.dy + s.gfx.y > canvas_height || s.dy + s.gfx.y < 0) {
+        return false;
     }
 
     return hasBounced;

@@ -49,6 +49,7 @@ function saveState() {
             y: b.gfx.y,
             width: b.gfx.width,
             height: b.gfx.height,
+            hp: b.hp
         });
     }
 
@@ -97,7 +98,9 @@ function clearEverything() {
 // bind to the save/load buttons
 $(function() {
     $("#state-save").on("click", function() {
-        $("#state-dump").val(saveState());
+        var stateString = saveState();
+        $("#state-dump").val(stateString);
+        window.location.hash = "#" + btoa(stateString);
     });
 
     $("#state-load").on("click", function() {
