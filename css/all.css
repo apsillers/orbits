@@ -1,0 +1,18 @@
+.target-item {
+    padding: 2px;
+    background-color: #55F;
+    cursor: pointer;
+    margin: 2px 0;
+}
+
+.target-item-delete {
+    float: right;
+    border: thin solid black;
+    margin: 0 0 2px 0;
+    padding: 0;
+    font-family: monospace;
+}
+
+body {
+    font-family: sans-serif;
+}

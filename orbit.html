@@ -1,0 +1,393 @@
+<html>
+<head>
+<script src="js/lib/cake.min.js"></script>
+<script src="js/lib/jquery.min.js"></script>
+<script src="js/classes.js"></script>
+<script src="js/depressedkeys.js"></script>
+<script src="js/saveload.js"></script>
+<script src="js/tools.js"></script>
+<script src="js/music.js"></script>
+<link href="css/all.css" rel="stylesheet" type="text/css" media="all"> 
+<script language="javascript">
+var emitters = [];
+var shots = [];
+var targets = [];
+var blocks = [];
+
+newWell = null;
+newWellTimeout = null;
+newEmitter = null;
+newEmitterTimeout = null;
+
+POPPING_POWER = 800; // the strength at which user-made wells can be popped
+POWER_PER_RADIUS = 15; // power units per pixel of radius
+POWER_PER_SHOT = 30; // power gained when consuming a shot
+POWER_ADJUST_FACTOR = 3; // tweaks how powerful wells are
+ATROPHY_RATE = 0.5; // decrease in power per cycle of non-static wells
+BASE_WELL_SIZE = 5; // minimum size of a new well
+MAX_SHOTS = 100;
+WORLD_PERIOD = 7;
+SHOT_RATE = 500; // how often emitters fire shots
+BASE_SHOT_SPEED = 1.5; // how fast shots move normally
+SMALL_SPEED_INC = 0.16;
+LARGE_SPEED_INC = 0.8;
+
+function init() {
+    canvas = new Canvas($("#canvas-div").get(0), 800, 600, {fill:"black"});
+	
+	$(canvas.canvas).on("mousemove", function(e) {
+	    var offset = $(this).offset();
+        var offsetX = e.pageX - offset.left;
+        var offsetY = e.pageY - offset.top;
+        // if a new well is being placed, have it follow the cursor
+	    if(newWell) {
+		    newWell.x = offsetX;
+		    newWell.y = offsetY;
+		}
+        // if an emitter is being placed, tilt it to follow the cursor
+        if(newEmitter) {
+            var deltaX = newEmitter.x - offsetX;
+            var deltaY = newEmitter.y - offsetY;
+            var rot = deltaX>0?Math.atan(deltaY/deltaX)-Math.PI:Math.atan(deltaY/deltaX);
+            if(deltaX==0) { rot *= -1; }
+            newEmitter.rotation = [rot,0,0];
+        }
+	});
+	
+	$(canvas.canvas).on("contextmenu", function(e) { e.preventDefault(); })
+	$(canvas.canvas).css("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
+
+	// turn newWell into a real well
+	$(canvas.canvas).on("mouseup", function(e) {
+		var offset = $(this).offset();
+		var offsetX = e.pageX - offset.left;
+		var offsetY = e.pageY - offset.top;
+	    if(e.button == 0) {
+			if(newWell) {
+				new Well({x:offsetX, y:offsetY, static:depressedKeys.has("S"),
+                          consuming: !depressedKeys.has("A"), userMade: true,
+                          power:newWell.radius*POWER_PER_RADIUS});
+				canvas.removeChild(newWell);
+				newWell = null;
+			} else if(newWellTimeout != null) {
+				new Well({x:offsetX, y:offsetY, static:depressedKeys.has("S"),
+                          consuming: !depressedKeys.has("A"), userMade: true,
+                          power:BASE_WELL_SIZE*POWER_PER_RADIUS});
+                clearTimeout(newWellTimeout);
+                newWellTimeout = null;
+            }
+		} else if(e.button == 2) {
+			if(newEmitter) {
+                newEmitter.opacity = 1;
+				new Emitter({ gfx:newEmitter, rotation:newEmitter.rotation, x:newEmitter.x, y:newEmitter.y });
+				newEmitter = null;
+			} else if(newEmitterTimeout != null) {
+				newEmitter = null;
+                clearTimeout(newEmitterTimeout);
+                newEmitterTimeout = null;
+            }
+        }
+	});
+	
+	
+	$(canvas.canvas).on("mousedown", function(e) {
+		var offset = $(this).offset();
+		var offsetX = e.pageX - offset.left;
+		var offsetY = e.pageY - offset.top;
+	    if(e.button == 0) {
+            if(e.shiftKey) {
+                //drop a thing
+                new Target({color:$("#tool-color").val(), x:offsetX, y:offsetY, text:$("#tool-name").val(),
+                            properties:propertiesFromTool()});
+            } else if(!e.ctrlKey) {
+                // create newWell placeholder
+			    if(!newWell && !newWellTimeout) {
+                    // start making a new well (if no one cancels the timeout)
+				    newWellTimeout = setTimeout(function() {
+					    newWell = new Circle(BASE_WELL_SIZE, {fill:"#444", x:offsetX, y:offsetY});
+					    canvas.appendChild(newWell);
+					    newWellTimeout = null;
+				    }, 20);
+			    }
+            }
+		} else if(e.button == 2) {
+            if(!newEmitter && !newEmitterTimeout) {
+            // start making a new emitter (if no one cancels the timeout)
+		        newEmitterTimeout = setTimeout(function() {
+			        newEmitter = new Polygon([-10, 10, -10, -10, 10, 0], {fill:"purple", opacity:0.5, x:offsetX, y:offsetY});
+			        canvas.appendChild(newEmitter);
+			        newEmitterTimeout = null;
+		        }, 20);
+            }
+        }
+	});
+
+    // move everything, etc.
+    worldInt = setInterval(function() {
+        var now = +new Date();
+        var timeDiff = (typeof lastTime != "undefined") ? now - lastTime : WORLD_PERIOD;
+        do {
+            worldLoop();
+            timeDiff -= WORLD_PERIOD;
+        } while(timeDiff >= WORLD_PERIOD);
+        lastTime = +new Date();
+    }, WORLD_PERIOD);
+	
+    // emitters fire periodically
+	shotInt = setInterval(function() {
+        for(var i = 0; i < emitters.length; ++i) {
+            var emitr = emitters[i];
+		    if(shots.length < MAX_SHOTS) {
+	            new Well({
+                    gfx:new Circle(2, {fill:"#fff"}),
+                    x:emitr.gfx.x, y:emitr.gfx.y,
+                    power:0, radius:2, static: true,
+                    consuming:false,
+                    dx:emitr.shotDx, dy:emitr.shotDy,
+                    color:"white"});
+            }
+        }
+	}, SHOT_RATE);
+
+    addPlayButton(canvas);
+
+	setupCourse();
+}
+
+// used at the beginning of click handlers to stop default click behaviors
+function allowClick() {
+    clearTimeout(newWellTimeout);
+    newWellTimeout = null;
+}
+
+function worldLoop() {
+	
+	// move emitters
+    for(var i=0; i< emitters.length; ++i) {
+		var p = emitters[i];
+		var sum = Math.abs(p.dx) + Math.abs(p.dy);
+		if(sum) {
+	        p.gfx.x += p.speed * p.dx/sum;
+		    p.gfx.y += p.speed * p.dy/sum;
+		}
+	}
+	
+	// handles shots
+	for(var i=0; i< shots.length; ++i) {
+		var s = shots[i];
+		
+		// acceleration due to gravity wells
+		for(var j=0; j < shots.length; ++j) {
+			var w = shots[j];
+			
+			// only move the shot if: the well is the shot, the well has nonzero pull, and the shot is not user-made
+			if(w != s && w.power > 0 && !s.userMade) {
+				var vect = distVector(w.gfx, s.gfx, true);
+				var strength = w.power / POWER_PER_RADIUS / vect.r / POWER_ADJUST_FACTOR;
+				
+				var ddx = strength * (vect.x);
+				var ddy = strength * (vect.y);
+
+				s.dx += ddx * s.gravReaction;
+				s.dy += ddy * s.gravReaction;
+
+				// gavity wells eat shots
+				if(w.consuming && !s.userMade && s.edible && vect.r < w.gfx.radius + s.gfx.radius) {
+					if(!w.static) w.power += POWER_PER_SHOT;
+					s.remove();
+				}
+				
+				// add a message to very large wells
+				/*if(w.power > POPPING_POWER && w.userMade && w.gfx.childNodes.length == 0) {
+					w.gfx.appendChild(new TextNode("Click to pop", {fill:"black", textAlign:"center"}));
+				}*/
+			}
+		}
+		
+		// slow down very fast shots
+		var sum = Math.abs(s.dx) + Math.abs(s.dy);
+		var speed = Math.sqrt(s.dx*s.dx + s.dy*s.dy);
+		if(speed > s.baseSpeed) {
+            var slowdown = speed>2*s.baseSpeed?s.bigSlowdown:s.smallSlowdown;
+			s.dx = (Math.abs(s.dx)/s.dx || 0) * Math.max(0, ((Math.abs(s.dx) - (slowdown) * (Math.abs(s.dx)/sum || 0))));
+			s.dy = (Math.abs(s.dy)/s.dy || 0) * Math.max(0, ((Math.abs(s.dy) - (slowdown) * (Math.abs(s.dy)/sum || 0))));
+		}
+		
+		// speed up slow shots
+		if(speed < s.baseSpeed) {
+			s.dx = (Math.abs(s.dx)/s.dx || 0) * (Math.abs(s.dx) + (speed < s.baseSpeed/2?s.bigSpeedup:s.smallSpeedup) * (Math.abs(s.dx)/sum || 0));
+			s.dy = (Math.abs(s.dy)/s.dy || 0) * (Math.abs(s.dy) + (speed < s.baseSpeed/2?s.bigSpeedup:s.smallSpeedup) * (Math.abs(s.dy)/sum || 0));
+		}
+
+		var diffX = s.dx;
+		var diffY = s.dy;
+		
+		// move shots; bounce shots off walls if out of bounds
+		if(s.dx + s.gfx.x > canvas.width) {
+			s.gfx.x = 2*canvas.width - (s.gfx.x + s.dx);
+			s.dx *= -1;
+		} else if(s.dx + s.gfx.x < 0) {
+			s.gfx.x = -(s.gfx.x + s.dx);
+			s.dx *= -1;
+		} else {
+			s.gfx.x += s.dx;
+		}
+
+		if(s.dy + s.gfx.y > canvas.height) {
+			s.gfx.y = 2*canvas.height - (s.gfx.y + s.dy);
+			s.dy *= -1;
+		} else if(s.dy + s.gfx.y < 0) {
+			s.gfx.y = -(s.gfx.y + s.dy);
+			s.dy *= -1;
+		} else {
+			s.gfx.y += s.dy;
+		}
+
+        for(var j=0; j < blocks.length; ++j) {
+    		if(diffX + s.gfx.x > canvas.width) {
+			    s.gfx.x = 2*canvas.width - (s.gfx.x + diffX);
+			    s.dx *= -1;
+		    } else if(diffX + s.gfx.x < 0) {
+			    s.gfx.x = -(s.gfx.x + diffX);
+			    s.dx *= -1;
+		    } else {
+			    s.gfx.x += diffX;
+		    }
+
+		    if(diffY + s.gfx.y > canvas.height) {
+			    s.gfx.y = 2*canvas.height - (s.gfx.y + diffY);
+			    s.dy *= -1;
+		    } else if(diffY + s.gfx.y < 0) {
+			    s.gfx.y = -(s.gfx.y + diffY);
+			    s.dy *= -1;
+		    } else {
+			    s.gfx.y += diffY;
+		    }
+        }
+
+		// atropy non-static wells
+		if(s.power > 0 && !s.static) {
+			if(!s.protected && (s.power-=ATROPHY_RATE) <= 0) s.remove();
+			else {
+			    s.gfx.radius = s.power / POWER_PER_RADIUS;
+				if(self.userMade && s.power < POPPING_POWER) s.gfx.removeAllChildren(); //remove message
+			}
+		}
+
+		// recolor and re-assign props to shots that go through targets
+		for(var j=0; j < targets.length; ++j) {
+	        var t = targets[j];
+			var vect = distVector(t.gfx, s.gfx);
+			
+			if(vect.r < t.gfx.radius + s.gfx.radius && !s.userMade) {
+				s.gfx.fill = t.gfx.fill;
+
+                s.gravReaction = parseInt(t.properties.gravReaction || 1);
+                s.baseSpeed = BASE_SHOT_SPEED * (t.properties.speedFactor || 1);
+                s.power = parseInt(t.properties.gravPull || 0);
+                s.gfx.radius = parseInt(t.properties.radius || 2);
+                s.edible = (typeof t.properties.edible != "undefined") ? t.properties.edible : true;
+                s.smallSlowdown = parseInt((t.properties.smallSlowdown || 1) * SMALL_SPEED_INC);
+                s.smallSpeedup = parseInt((t.properties.smallSpeedup || 1) * SMALL_SPEED_INC);
+		    }
+		}
+		
+	}
+	
+	// if making a new well, increase the size of the placeholder
+	if(newWell) newWell.radius = Math.min(newWell.radius+newWell.radius/20, 40);
+}
+
+function setupCourse() {
+    new Target({color:"red", x:100, y:160, text:"RvGr", properties:{gravReaction:-1}});
+	new Target({color:"orange", x:200, y:100, text:"LoGr", properties:{gravReaction:0.25}});
+	new Target({color:"blue", x:600, y:100, text:"LoSp",  properties:{speedFactor:0.5, smallSlowdown:5}});
+	new Target({color:"#5F5", x:700, y:160, text:"HiSp", properties:{speedFactor:2, smallSpeedup:5}});
+	new Target({color:"yellow", x:600, y:400, text:"HiGr", properties:{gravReaction:4, edible:false}});
+	new Target({color:"#F55", x:400, y:300, text:"MkGr",  properties:{gravPull:50, radius:3}, radius:27});
+
+    new Emitter({ rotation:0, x:50, y:550, shotDx: 1 });
+}
+
+function distVector(obj1, obj2, log) {
+	var distX = obj1.x - obj2.x;
+	var distY = obj1.y - obj2.y;
+	var sum = Math.abs(distX) + Math.abs(distY) || 0.01;
+    return {x: distX/sum,
+	        y: distY/sum,
+			r: Math.sqrt(distX*distX + distY*distY)};
+}
+
+// clean up when cake skips removals
+setInterval(function() {
+    for(var i = 0; i < canvas.childNodes.length; ++i) {
+        if(canvas.childNodes[i].erased == true) {
+            canvas.remove(canvas.childNodes[i]);
+        }
+    }
+}, 5000);
+</script>
+</head>
+<body onload="init()">
+    <div style="float:left;" id="canvas-div"></div>
+	<div style="float:left;">
+
+        <div style="border:thin solid blue; padding: 7px 17px 5px 4px ; margin: 0px 5px 5px 5px; width: 200px;">
+            <div><strong>Wells:</strong></div>
+            <div style="border:thin solid gray; float: left; padding: 3px; margin: 2px;" id="tool-well-static" title="Static: does not atrophy or grow.">(<strong>S</strong>) Static</div>
+            <div style="border:thin solid gray; float: left; padding: 3px; margin: 2px;" id="tool-well-noncon" title="Unconsuming: shots are not eaten by this well.">(<strong>A</strong>) Unconsuming</div>
+            <div style="clear:both;">Hold down keys to drop wells with the specified properties.</div>
+	    </div>
+
+        <div style="border:thin solid blue; padding: 7px 17px 0 4px ; margin: 0 5px; width: 200px;">
+            <div><strong>Targets:</strong></div>
+            <table>
+              <tr title="Grav Factor: how the shot is affected by gavity. Negative values induce revgrav effects."><td>Grav Factor:</td><td><input type="text" id="tool-gravFactor" size="2" value="1" /></td></tr>
+              <tr title="Grav Pull: strength of the shot's own gavitational field."><td>Grav Pull:</td><td><input type="text" id="tool-power" size="2" value="1" /></td></tr>
+              <tr title="Speed Factor: multiplies the shot's base speed."><td>Speed Factor:</td><td><input type="text" id="tool-speedFactor" size="2" value="1" /></td></tr>
+              <tr title="Slowdown factor: how quicky the shot decelerates back to its base speed when going very fast."><td>Slowdown:</td><td><input type="text" id="tool-slowdown" size="3" value="1" /></td></tr>
+              <tr title="Speedup factor: how quicky the shot accelerates back to its base speed when moving too slowly."><td>Speedup:</td><td><input type="text" id="tool-speedup" size="3" value="1" /></td></tr>
+              <tr title="Shot Radius: how big the shot becomes."><td>Shot Radius:</td><td><input type="text" id="tool-shotRadius" size="3" value="2" /></td></tr>
+              <tr title="Edible: can wells eat the shot?"><td>Edible:</td><td><input type="checkbox" id="tool-edible" checked="checked" /></td></tr>
+
+              <tr title="Color: #RGB or named color" /><td>Color:</td><td><input type="text" id="tool-color" size="6" value="#FF44FF" onchange="$(this).css('background-color', $(this).val())" /></td></tr>
+              <tr title="Name: printed name"><td>Name:</td><td><input type="text" id="tool-name" size="4" maxlength="6" value="MyTrgt"/></td></tr>
+              <tr><td colspan="2"><input type="button" id="tool-save" value="Save Target"/></td></tr>
+              <tr><td colspan="2"><div id="tool-list"></div></td></tr>
+            </table>
+        </div>
+
+    </div>
+
+    <div style="float:left;">
+	    <div style="border:thin solid blue; padding: 7px 17px 0 4px ; margin: 0 5px; width: 200px;">
+		    <strong>Controls:</strong>
+	        <ul>
+		      <li style="padding-bottom: 6px;"><strong>Left click</strong> (and hold) to create a pellet-eating gavity well.</li>
+		      <li style="padding-bottom: 6px;"><strong>Right click</strong> (and hold to angle) to create a pellet-producing emitter.</li>
+              <li style="padding-bottom: 6px;">Create new targets using the editor and place them with <strong>Shift+Click</strong>.</li>
+		      <li style="padding-bottom: 6px;">Use <strong>Ctrl+Click</strong> to remove any object.</li>
+		      <li style="padding-bottom: 6px;">Color targets and emitters are <strong>draggable</strong>.</li>
+		      <li style="padding-bottom: 6px;">There are no victory conditions.</li>
+	    </div>
+
+	    <div style="float:left; border:thin solid blue; padding: 7px 17px 0 4px ; margin: 5px 5px; width: 200px;">
+		    <strong>Save State:</strong>
+            <div><textarea id="state-dump" style="height:100px; width: 100%; margin: 0 auto;">{"shots":[{"static":true,"userMade":true,"power":600,"consuming":true,"x":419,"y":275,"radius":40}],"targets":[{"color":"#FF44FF","x":330,"y":406,"text":"MyTrgt","properties":{"gravReaction":"1","smallSpeedup":"1","smallSlowdown":"1","gravPull":"0","speedFactor":"2","radius":"2","edible":true}}],"emitters":[{"color":"purple","x":316,"y":404,"rotation":[0,0,0]}]}</textarea></div>
+            <div>
+                <input id="state-save" type="button" title="Save: populate the box above with state data" value="Save" />
+                <input id="state-load" type="button" title="Load: use data in the box above to create a level configuation" value="Load" />
+                <input id="state-sample" type="button" title="Demo: load a demo" value="Demo" />
+            </div>
+	    </div>
+    </div>
+<img style="display:none;" src="media/gameplay.png" />
+
+<audio id="music" loop="loop">
+    <source src="media/lunar.mp3" type="audio/mpeg" />
+    <source src="media/lunar.ogg" type="audio/ogg" />
+</audio>
+
+<div style="clear:left; padding-top: 5px;">Music: <a href="http://ccmixter.org/files/lunarmusic/37563">Lunar (Progressive Trance - Short Track)</a> by <a href="https://www.facebook.com/pages/Lunar/453977381296249">Lunar</a> [<a href="http://creativecommons.org/licenses/by/2.0/">cc-by license</a>]</div>
+</body>
+</html>
