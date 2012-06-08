@@ -115,7 +115,9 @@ function Well(options) {
 
 function Block(options) {
     var self = this;
-    this.gfx = options.gfx || new Rectangle(10);
+    this.width = options.width || 50;
+    this.height = options.height || 50;
+    this.gfx = options.gfx || new Rectangle(this.width, this.height);
     this.gfx.x = options.x;
     this.gfx.y = options.y;
     this.gfx.fill = options.color || "red";

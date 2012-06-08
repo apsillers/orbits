@@ -3,6 +3,7 @@
 <script src="js/lib/cake.min.js"></script>
 <script src="js/lib/jquery.min.js"></script>
 <script src="js/classes.js"></script>
+<script src="js/bounce.js"></script>
 <script src="js/depressedkeys.js"></script>
 <script src="js/saveload.js"></script>
 <script src="js/tools.js"></script>
@@ -219,51 +220,9 @@ function worldLoop() {
 			s.dy = (Math.abs(s.dy)/s.dy || 0) * (Math.abs(s.dy) + (speed < s.baseSpeed/2?s.bigSpeedup:s.smallSpeedup) * (Math.abs(s.dy)/sum || 0));
 		}
 
-		var diffX = s.dx;
-		var diffY = s.dy;
-		
-		// move shots; bounce shots off walls if out of bounds
-		if(s.dx + s.gfx.x > canvas.width) {
-			s.gfx.x = 2*canvas.width - (s.gfx.x + s.dx);
-			s.dx *= -1;
-		} else if(s.dx + s.gfx.x < 0) {
-			s.gfx.x = -(s.gfx.x + s.dx);
-			s.dx *= -1;
-		} else {
-			s.gfx.x += s.dx;
-		}
-
-		if(s.dy + s.gfx.y > canvas.height) {
-			s.gfx.y = 2*canvas.height - (s.gfx.y + s.dy);
-			s.dy *= -1;
-		} else if(s.dy + s.gfx.y < 0) {
-			s.gfx.y = -(s.gfx.y + s.dy);
-			s.dy *= -1;
-		} else {
-			s.gfx.y += s.dy;
-		}
-
-        var hasBounced = false;
-        for(var j=0; j < blocks.length; ++j) {
-		    if(s.dx + s.gfx.x > canvas.width) {
-			    s.gfx.x = 2*canvas.width - (s.gfx.x + s.dx);
-			    s.dx *= -1;
-		    } else if(s.dx + s.gfx.x < 0) {
-			    s.gfx.x = -(s.gfx.x + s.dx);
-			    s.dx *= -1;
-		    } else {
-			    s.gfx.x += s.dx;
-		    }
-
-		    if(s.dy + s.gfx.y > canvas.height) {
-			    s.gfx.y = 2*canvas.height - (s.gfx.y + s.dy);
-			    s.dy *= -1;
-		    } else if(s.dy + s.gfx.y < 0) {
-			    s.gfx.y = -(s.gfx.y + s.dy);
-			    s.dy *= -1;
-		    } else {
-			    s.gfx.y += s.dy;
-		    }
+        // handle bouncing against blocks and arena walls
+        if(!s.userMade) {
+            while(doBounces(s, blocks, canvas.height, canvas.width));
         }
 
 		// atropy non-static wells
@@ -306,6 +265,9 @@ function setupCourse() {
 	new Target({color:"#5F5", x:700, y:160, text:"HiSp", properties:{speedFactor:2, smallSpeedup:5}});
 	new Target({color:"yellow", x:600, y:400, text:"HiGr", properties:{gravReaction:4, edible:false}});
 	new Target({color:"#F55", x:400, y:300, text:"MkGr",  properties:{gravPull:50, radius:3}, radius:27});
+
+    new Block({color:"#AAA", x:600, y:525})
+    new Block({color:"#999", x:100, y:300})
 
     new Emitter({ rotation:0, x:50, y:550, shotDx: 1 });
 }
