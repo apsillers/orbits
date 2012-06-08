@@ -3,6 +3,7 @@ function saveState() {
     state.shots = [];
     state.targets = [];
     state.emitters = [];
+    state.blocks = [];
     for(var i=0, l=shots.length; i<l; ++i) {
         var s = shots[i];
         if(s.static && s.userMade) {
@@ -40,6 +41,17 @@ function saveState() {
         });
     }
 
+    for(var i=0, l=blocks.length; i<l; ++i) {
+        var b = blocks[i];
+        state.blocks.push({
+            color: b.gfx.fill,
+            x: b.gfx.x,
+            y: b.gfx.y,
+            width: b.gfx.width,
+            height: b.gfx.height,
+        });
+    }
+
     return JSON.stringify(state);
 }
 
@@ -59,6 +71,10 @@ function loadState(state) {
     for(var i=0, l=state.emitters.length; i<l; ++i) {
          new Emitter(state.emitters[i]);
     }
+
+    for(var i=0, l=state.blocks.length; i<l; ++i) {
+         new Block(state.blocks[i]);
+    }
 }
 
 /* clears out targets, emitters, shots, and wells */
@@ -71,6 +87,10 @@ function clearEverything() {
     }
     while(typeof emitters[0] != "undefined") {
          emitters[0].remove();
+    }
+
+    while(typeof blocks[0] != "undefined") {
+         blocks[0].remove();
     }
 }
 

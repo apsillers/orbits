@@ -136,6 +136,6 @@ function Block(options) {
 
     this.remove = function() {
         this.gfx.removeSelf();
-        emitters.splice(emitters.indexOf(this), 1);
+        blocks.splice(blocks.indexOf(this), 1);
     };
 }
