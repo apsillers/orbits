@@ -10,35 +10,11 @@
 <script src="js/saveload.js"></script>
 <script src="js/tools.js"></script>
 <script src="js/music.js"></script>
+<script src="js/misc.js"></script>
 <link href="css/all.css" rel="stylesheet" type="text/css" media="all"> 
-<script language="javascript">
 
-// used at the beginning of click handlers to stop default click behaviors
-function allowClick() {
-    clearTimeout(newWellTimeout);
-    newWellTimeout = null;
-}
-
-function distVector(obj1, obj2, log) {
-    var distX = obj1.x - obj2.x;
-    var distY = obj1.y - obj2.y;
-    var sum = Math.abs(distX) + Math.abs(distY) || 0.01;
-    return {x: distX/sum,
-            y: distY/sum,
-            r: Math.sqrt(distX*distX + distY*distY)};
-}
-
-// clean up when cake skips removals
-setInterval(function() {
-    for(var i = 0; i < canvas.childNodes.length; ++i) {
-        if(canvas.childNodes[i].erased == true) {
-            canvas.remove(canvas.childNodes[i]);
-        }
-    }
-}, 5000);
-</script>
 </head>
-<body onload="init()">
+<body>
     <div style="float:left;" id="canvas-div"></div>
     <div style="float:left;">
 
@@ -60,7 +36,7 @@ setInterval(function() {
               <tr title="Shot Radius: how big the shot becomes."><td>Shot Radius:</td><td><input type="text" id="tool-shotRadius" size="3" value="2" /></td></tr>
               <tr title="Edible: can wells eat the shot?"><td>Edible:</td><td><input type="checkbox" id="tool-edible" checked="checked" /></td></tr>
 
-              <tr title="Color: #RGB or named color" /><td>Color:</td><td><input type="text" id="tool-color" size="6" value="#FF44FF" onchange="$(this).css('background-color', $(this).val())" /></td></tr>
+              <tr title="Color: #RGB or named color" /><td>Color:</td><td><input type="text" id="tool-color" size="6" value="#FF44FF" /></td></tr>
               <tr title="Name: printed name"><td>Name:</td><td><input type="text" id="tool-name" size="4" maxlength="6" value="MyTrgt"/></td></tr>
               <tr><td colspan="2"><input type="button" id="tool-save" value="Save Target"/></td></tr>
               <tr><td colspan="2"><div id="tool-list"></div></td></tr>
