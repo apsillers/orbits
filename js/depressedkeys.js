@@ -14,9 +14,9 @@ depressedKeys.has = function(key) {
     return key in this.keys;
 }
 depressedKeys.toggleMap = {
-    "A":{ id: "tool-well-noncon", property: "background-color", vals:["#FFF","#F66"], current:false },
-    "S":{ id: "tool-well-static", property: "background-color", vals:["#FFF","#F66"], current:false },
-    "Z":{ id: "tool-emit-place", property: "background-color", vals:["#FFF","#6F6"], current:false }
+    "A":{ id: "tool-well-noncon", property: "background-color", vals:["inherit","#F66"], current:false },
+    "S":{ id: "tool-well-static", property: "background-color", vals:["inherit","#F66"], current:false },
+    "Z":{ id: "tool-emit-place", property: "background-color", vals:["inherit","#6F6"], current:false }
 }
 
 $(document).keydown(function(e) {

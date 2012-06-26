@@ -21,7 +21,8 @@ function worldLoop() {
             // only move the shot if: the well is the shot, the well has nonzero pull, and the shot is not user-made
             if(w != s && w.power > 0 && !s.userMade) {
                 var vect = distVector(w.gfx, s.gfx, true);
-                var strength = w.power / POWER_PER_RADIUS / (vect.r*vect.r) / POWER_ADJUST_FACTOR;
+                var dist = Math.max(vect.r, w.gfx.radius);
+                var strength = w.power / POWER_PER_RADIUS / (dist*dist) / POWER_ADJUST_FACTOR;
                 
                 var ddx = strength * (vect.x);
                 var ddy = strength * (vect.y);

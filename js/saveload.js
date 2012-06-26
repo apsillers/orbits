@@ -110,6 +110,6 @@ $(function() {
 
     $("#state-sample").on("click", function() {
         clearEverything();
-        loadState('{"shots":[{"static":true,"userMade":true,"power":600,"consuming":true,"x":419,"y":275,"radius":40}],"targets":[{"color":"#FF44FF","x":330,"y":406,"text":"MyTrgt","properties":{"gravReaction":"1","smallSpeedup":"1","smallSlowdown":"1","gravPull":"0","speedFactor":"2","radius":"2","edible":true}}],"emitters":[{"color":"purple","x":316,"y":404,"rotation":[0,0,0]}]}');
+        loadState('{"shots":[{"static":true,"userMade":true,"power":600,"consuming":true,"x":419,"y":275,"radius":40}],"targets":[{"color":"#0ff","x":321,"y":315,"text":"Faster","properties":{"gravReaction":"4","smallSpeedup":"1","smallSlowdown":"1","gravPull":"0","speedFactor":"5","radius":"2","edible":true}},{"color":"#ff0","x":525,"y":325,"text":"Slower","properties":{"gravReaction":"2","smallSpeedup":"1","smallSlowdown":"1","gravPull":"0","speedFactor":"3","radius":"2","edible":true}}],"emitters":[{"color":"purple","x":462,"y":356,"rotation":[0,0,0]},{"color":"purple","x":365,"y":346,"rotation":[-3.141592653589793,0,0]}],"blocks":[]}');
     });
 });

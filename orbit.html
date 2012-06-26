@@ -10,70 +10,89 @@
 <script src="js/saveload.js"></script>
 <script src="js/tools.js"></script>
 <script src="js/music.js"></script>
+<script src="js/menu.js"></script>
 <script src="js/misc.js"></script>
 <link href="css/all.css" rel="stylesheet" type="text/css" media="all"> 
 
 </head>
 <body>
     <div style="float:left;" id="canvas-div"></div>
-    <div style="float:left;">
 
-        <div style="border:thin solid blue; padding: 7px 17px 5px 4px ; margin: 0px 5px 5px 5px; width: 200px;">
-            <div><strong>Wells:</strong></div>
-            <div style="border:thin solid gray; float: left; padding: 3px; margin: 2px;" id="tool-well-static" title="Static: does not atrophy or grow.">(<strong>S</strong>) Static</div>
-            <div style="border:thin solid gray; float: left; padding: 3px; margin: 2px;" id="tool-well-noncon" title="Unconsuming: shots are not eaten by this well.">(<strong>A</strong>) Unconsuming</div>
-            <div style="clear:both;">Hold down keys to drop wells with the specified properties.</div>
-        </div>
+    <div id="menu">
+        <div class="tab" id="wells-tab">Well</div>
+        <div class="tab" id="targets-tab">Target</div>
+        <div class="tab" id="emitters-tab">Emitter</div>
+        <div class="tab" id="blocks-tab">Block</div>
+        <div class="tab" id="save-tab">Save/Load</div>
+        <div class="tab" style="font-weight:bold;" id="help-tab">Help</div>
+        <div style="clear:both; padding-bottom: 4px;"></div>
 
-        <div style="border:thin solid blue; padding: 7px 17px 0 4px ; margin: 0 5px; width: 200px;">
-            <div><strong>Targets:</strong></div>
-            <table>
-              <tr title="Grav Factor: how the shot is affected by gavity. Negative values induce revgrav effects."><td>Grav Factor:</td><td><input type="text" id="tool-gravFactor" size="2" value="1" /></td></tr>
-              <tr title="Grav Pull: strength of the shot's own gavitational field."><td>Grav Pull:</td><td><input type="text" id="tool-power" size="2" value="1" /></td></tr>
-              <tr title="Speed Factor: multiplies the shot's base speed."><td>Speed Factor:</td><td><input type="text" id="tool-speedFactor" size="2" value="1" /></td></tr>
-              <tr title="Slowdown factor: how quicky the shot decelerates back to its base speed when going very fast."><td>Slowdown:</td><td><input type="text" id="tool-slowdown" size="3" value="1" /></td></tr>
-              <tr title="Speedup factor: how quicky the shot accelerates back to its base speed when moving too slowly."><td>Speedup:</td><td><input type="text" id="tool-speedup" size="3" value="1" /></td></tr>
-              <tr title="Shot Radius: how big the shot becomes."><td>Shot Radius:</td><td><input type="text" id="tool-shotRadius" size="3" value="2" /></td></tr>
-              <tr title="Edible: can wells eat the shot?"><td>Edible:</td><td><input type="checkbox" id="tool-edible" checked="checked" /></td></tr>
+        <div id="menu-body">
+            <div id="dummy-body" class="tab-body selected">
+                Select a tool above to begin adding components to the arena.
+            </div>
 
-              <tr title="Color: #RGB or named color" /><td>Color:</td><td><input type="text" id="tool-color" size="6" value="#FF44FF" /></td></tr>
-              <tr title="Name: printed name"><td>Name:</td><td><input type="text" id="tool-name" size="4" maxlength="6" value="MyTrgt"/></td></tr>
-              <tr><td colspan="2"><input type="button" id="tool-save" value="Save Target"/></td></tr>
-              <tr><td colspan="2"><div id="tool-list"></div></td></tr>
-            </table>
-        </div>
+            <div id="targets-body" class="tab-body">
+                <table>
+                  <tr title="Grav Factor: how the shot is affected by gavity. Negative values induce revgrav effects."><td>Grav Factor:</td><td><input type="text" id="tool-gravFactor" size="2" value="1" /></td></tr>
+                  <tr title="Grav Pull: strength of the shot's own gavitational field."><td>Grav Pull:</td><td><input type="text" id="tool-power" size="2" value="0" /></td></tr>
+                  <tr title="Speed Factor: multiplies the shot's base speed."><td>Speed Factor:</td><td><input type="text" id="tool-speedFactor" size="2" value="1" /></td></tr>
+                  <tr title="Slowdown factor: how quicky the shot decelerates back to its base speed when going very fast."><td>Slowdown:</td><td><input type="text" id="tool-slowdown" size="3" value="1" /></td></tr>
+                  <tr title="Speedup factor: how quicky the shot accelerates back to its base speed when moving too slowly."><td>Speedup:</td><td><input type="text" id="tool-speedup" size="3" value="1" /></td></tr>
+                  <tr title="Shot Radius: how big the shot becomes."><td>Shot Radius:</td><td><input type="text" id="tool-shotRadius" size="3" value="2" /></td></tr>
+                  <tr title="Edible: can wells eat the shot?"><td>Edible:</td><td><input type="checkbox" id="tool-edible" checked="checked" /></td></tr>
 
-    </div>
+                  <tr title="Color: #RGB or named color" /><td>Color:</td><td><input type="text" id="tool-color" size="6" value="#FF44FF" /></td></tr>
+                  <tr title="Name: printed name"><td>Name:</td><td><input type="text" id="tool-name" size="4" maxlength="6" value="MyTrgt"/></td></tr>
+                  <tr><td colspan="2"><input type="button" id="tool-save" value="Save Target"/></td></tr>
+                  <tr><td colspan="2"><div id="tool-list"></div></td></tr>
+                </table>
+            </div>
 
-    <div style="float:left;">
-        <div style="border:thin solid blue; padding: 7px 17px 0 4px ; margin: 0 5px; width: 200px;">
-            <strong>Controls:</strong>
-            <ul>
-              <li style="padding-bottom: 6px;"><strong>Left click</strong> (and hold) to create a pellet-eating gavity well.</li>
-              <li style="padding-bottom: 6px;"><strong>Right click</strong> (and hold to angle) to create a pellet-producing emitter.</li>
-              <li style="padding-bottom: 6px;">Create new targets using the editor and place them with <strong>Shift+Click</strong>.</li>
-              <li style="padding-bottom: 6px;">Use <strong>Ctrl+Click</strong> to remove any object.</li>
-              <li style="padding-bottom: 6px;">Color targets and emitters are <strong>draggable</strong>.</li>
-              <li style="padding-bottom: 6px;">There are no victory conditions.</li>
-        </div>
+            <div id="wells-body" class="tab-body">
+                <div style="border:thin solid gray; float: left; padding: 3px; margin: 2px;" id="tool-well-static" title="Static: does not atrophy or grow.">(<strong>S</strong>) Static</div>
+                <div style="border:thin solid gray; float: left; padding: 3px; margin: 2px;" id="tool-well-noncon" title="Unconsuming: shots are not eaten by this well.">(<strong>A</strong>) Unconsuming</div>
+                <div style="clear:both;">Hold down keys to drop wells with the specified properties.</div>
+            </div>
 
-        <div style="float:left; border:thin solid blue; padding: 7px 17px 0 4px ; margin: 5px 5px; width: 200px;">
-            <strong>Save State:</strong>
-            <div><textarea id="state-dump" style="height:100px; width: 100%; margin: 0 auto;">{"shots":[{"static":true,"userMade":true,"power":600,"consuming":true,"x":419,"y":275,"radius":40}],"targets":[{"color":"#FF44FF","x":330,"y":406,"text":"MyTrgt","properties":{"gravReaction":"1","smallSpeedup":"1","smallSlowdown":"1","gravPull":"0","speedFactor":"2","radius":"2","edible":true}}],"emitters":[{"color":"purple","x":316,"y":404,"rotation":[0,0,0]}]}</textarea></div>
-            <div>
-                <input id="state-save" type="button" title="Save: populate the box above with state data" value="Save" />
-                <input id="state-load" type="button" title="Load: use data in the box above to create a level configuation" value="Load" />
-                <input id="state-sample" type="button" title="Demo: load a demo" value="Demo" />
+            <div id="emitters-body" class="tab-body">
+
+            </div>
+
+            <div id="blocks-body" class="tab-body">
+
+            </div>
+
+            <div id="save-body" class="tab-body">
+                <div><textarea id="state-dump" style="height:200px; width: 100%; margin: 0 auto;"></textarea></div>
+                <div>
+                    <input id="state-save" style="float:left;font-size:100%; margin-right: 5px;" type="button" title="Save: populate the box above with state data" value="Save" />
+                    <div style="float:left; font-size:90%; padding-top: 5px;">into this box</div>
+                    <div style="clear:both;"></div>
+                    <input id="state-load" style="float:left; font-size:100%; margin-right: 5px;" type="button" title="Load: use data in the box above to create a level configuation" value="Load" />
+                    <div style="float:left; font-size:90%; padding-top: 5px;">from this box</div>
+                    <div style="clear:both;"></div>
+                    <br /><br /><input style="float:left; margin-right: 5px;" id="state-sample" type="button" title="Demo: load a demo" value="Demo" />
+                    <div style="float:left; font-size:85%; padding-top: 5px;">Load pre-made demo</div>
+                    <div style="clear:both;"></div>
+                </div>
+            </div>
+
+            <div id="help-body" class="tab-body">
+                <ul>
+                    <li>On the todo list!</li>
+                </ul>
             </div>
         </div>
     </div>
-<img style="display:none;" src="media/gameplay.png" />
 
-<audio id="music" loop="loop">
-    <source src="media/lunar.mp3" type="audio/mpeg" />
-    <source src="media/lunar.ogg" type="audio/ogg" />
-</audio>
+    <img style="display:none;" src="media/gameplay.png" />
 
-<div style="clear:left; padding-top: 5px;">Music: <a href="http://ccmixter.org/files/lunarmusic/37563">Lunar (Progressive Trance - Short Track)</a> by <a href="https://www.facebook.com/pages/Lunar/453977381296249">Lunar</a> [<a href="http://creativecommons.org/licenses/by/2.0/">cc-by license</a>]</div>
+    <audio id="music" loop="loop">
+        <source src="media/lunar.mp3" type="audio/mpeg" />
+        <source src="media/lunar.ogg" type="audio/ogg" />
+    </audio>
+
+    <div style="clear:left; padding-top: 5px;">Music: <a href="http://ccmixter.org/files/lunarmusic/37563">Lunar (Progressive Trance - Short Track)</a> by <a href="https://www.facebook.com/pages/Lunar/453977381296249">Lunar</a> [<a href="http://creativecommons.org/licenses/by/2.0/">cc-by license</a>]</div>
 </body>
 </html>

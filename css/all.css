@@ -16,3 +16,43 @@
 body {
     font-family: sans-serif;
 }
+
+.tab {
+    float:left;
+    background-color: #004;
+    padding: 3px;
+    margin: 2px;
+    border: solid thin white;
+    cursor: pointer;
+}
+
+.tab.selected {
+    background-color: #33C; 
+}
+
+.tab-body {
+    display: none;
+}
+
+.tab-body.selected {
+    display: block;
+}
+
+#menu {
+    height: 590px;
+    width: 207px;
+    background-color: black;
+    float: left;
+    margin-left: 3px;
+    padding: 5px;
+    color: white;
+}
+
+#menu table {
+    color: white;
+}
+
+#menu-body {
+    height: 490px;
+    overflow-y: auto;
+}

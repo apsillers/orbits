@@ -4,6 +4,7 @@ function Emitter(options) {
     this.gfx.x = options.x;
     this.gfx.y = options.y;
     this.gfx.fill = options.color || "purple";
+    this.gfx.zIndex = 20;
 
     if(typeof options.rotation != "undefined") {
         var rot = options.rotation instanceof Array ? options.rotation[0] : options.rotation;
@@ -73,7 +74,7 @@ function Well(options) {
     this.gfx = options.gfx || new Circle(0, {fill:this.color||"white", stroke:"none"});
     this.gfx.x = (options.x != undefined) ? options.x : this.gfx.x;
     this.gfx.y = (options.y != undefined) ? options.y : this.gfx.y;
-    this.gfx.zIndex = -8;
+    this.gfx.zIndex = options.userMade?8:0;
     canvas.append(this.gfx);
     this.speed = options.speed || BASE_SHOT_SPEED;
     this.baseSpeed = options.speed || BASE_SHOT_SPEED;
@@ -115,15 +116,27 @@ function Well(options) {
 
 function Block(options) {
     var self = this;
-    this.width = options.width || 50;
-    this.height = options.height || 50;
+
     this.gfx = options.gfx || new Rectangle(this.width, this.height);
-    this.gfx.x = options.x;
-    this.gfx.y = options.y;
+    this.gfx.width = options.width || this.gfx.width || 50;
+    this.gfx.height = options.height || this.gfx.height || 50;
+    this.gfx.x = options.x || this.gfx.x;
+    this.gfx.y = options.y || this.gfx.y;
+
+    if(this.gfx.width < 0) { this.gfx.x += this.gfx.width; this.gfx.width = Math.abs(this.gfx.width); }
+    if(this.gfx.height < 0) { this.gfx.y += this.gfx.height; this.gfx.height = Math.abs(this.gfx.height); }
+
     this.gfx.fill = options.color || "red";
     this.hp = options.hp || 0;
+    this.mobile = options.mobile;
 
-    this.hit = function(dx, dy) { if(this.hp == 1) this.remove(); else if(this.hp > 0) this.hp--; }
+    this.hitFuncs = [];
+    this.hit = function(dx, dy){ for(var i=0; i < this.hitFuncs.length; ++i) { this.hitFuncs[i](dx,dy); } };
+    if(this.hp != 0) {
+        this.hitFuncs.push(function(dx, dy) { if(this.hp == 1) this.remove(); else if(this.hp > 0) this.hp--; });
+    } else if(this.mobile) {
+        this.hitFuncs.push(function(dx, dy) { this.gfx.x += dx; this.gfx.y += dy; });
+    }
 
     canvas.append(this.gfx);
     blocks.push(this);
