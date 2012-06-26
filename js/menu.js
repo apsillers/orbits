@@ -15,7 +15,6 @@ $(function() {
     $("#save-tab").click(showTabFunc("save"));
     $("#blocks-tab").click(showTabFunc("blocks"));
     $("#help-tab").click(showTabFunc("help"));
-    $("#blocks-tab").click();
 
     $("#tool-save").on("click", function() {
         var name = $("#tool-name").val();
