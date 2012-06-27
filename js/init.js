@@ -6,12 +6,12 @@ var blocks = [];
 POPPING_POWER = 800; // the strength at which user-made wells can be popped
 POWER_PER_RADIUS = 15; // power units per pixel of radius
 POWER_PER_SHOT = 30; // power gained when consuming a shot
-POWER_ADJUST_FACTOR = 0.06; // tweaks how powerful wells are
+POWER_ADJUST_FACTOR = 0.09; // tweaks how powerful wells are
 ATROPHY_RATE = 0.5; // decrease in power per cycle of non-static wells
 BASE_WELL_SIZE = 5; // minimum size of a new well
 MAX_SHOTS = 100;
 WORLD_PERIOD = 7;
-SHOT_RATE = 500; // how often emitters fire shots
+SHOT_RATE = WORLD_PERIOD*71; // how often emitters fire shots
 BASE_SHOT_SPEED = 1.5; // how fast shots move normally
 SMALL_SPEED_INC = 0.16;
 LARGE_SPEED_INC = 0.8;
@@ -42,7 +42,6 @@ function init() {
             var emitr = emitters[i];
             if(shots.length < MAX_SHOTS) {
                 new Well({
-                    gfx:new Circle(2, {fill:"#fff"}),
                     x:emitr.gfx.x, y:emitr.gfx.y,
                     power:0, radius:2, static: true,
                     consuming:false,
@@ -72,7 +71,7 @@ function setupCourse() {
     new Target({color:"yellow", x:600, y:400, text:"HiGr", properties:{gravReaction:4, edible:false}});
     new Target({color:"#F55", x:400, y:300, text:"MkGr",  properties:{gravPull:60, radius:3}, radius:27});
 
-    new Block({color:"#AAA", x:600, y:525});
+    new Block({color:"#AAA", x:600, y:525, mobile:true});
     new Block({color:"#A00", x:200, y:325});
 
     new Emitter({ rotation:0, x:50, y:550 });

@@ -4,8 +4,14 @@ function doBounces(shot, blocks, canvas_height, canvas_width) {
     for(var j=0; j < blocks.length; ++j) {
         var block = blocks[j];
         // if the shot would be inside this block at the end of the move, bounce it
-        if(s.dx + s.gfx.x > block.gfx.x && s.dx + s.gfx.x < block.gfx.x +  block.gfx.width &&
-           s.dy + s.gfx.y > block.gfx.y && s.dy + s.gfx.y < block.gfx.y +  block.gfx.height) {
+        if((s.dx + s.gfx.x > block.gfx.x && s.dx + s.gfx.x < block.gfx.x +  block.gfx.width &&
+            s.dy + s.gfx.y > block.gfx.y && s.dy + s.gfx.y < block.gfx.y +  block.gfx.height) ||
+           (s.gfx.x < block.gfx.x && s.gfx.x + s.dx> block.gfx.x &&
+            s.gfx.y > block.gfx.y && s.gfx.y < block.y + block.gfx.height &&
+            s.gfx.y + s.dy > block.gfx.y && s.gfx.y + s.dy < block.y + block.gfx.height) ||
+           (s.gfx.y < block.gfx.y && s.gfx.y + s.dy > block.gfx.y &&
+            s.gfx.x > block.gfx.x && s.gfx.x < block.x + block.gfx.width &&
+            s.gfx.x + s.dx > block.gfx.x && s.gfx.x + s.dx < block.x + block.gfx.width)) {
             // check if it started the move from the left or right, top or bottom
             var started_left = s.gfx.x <= block.gfx.x + block.gfx.width/2;
             var started_above = s.gfx.y <= block.gfx.y + block.gfx.height/2;

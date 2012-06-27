@@ -71,7 +71,7 @@ function Target(options) {
 function Well(options) {
     var undefined;
     var self = this;
-    this.gfx = options.gfx || new Circle(0, {fill:this.color||"white", stroke:"none"});
+    this.gfx = options.gfx || new Circle(0, {fill:options.color||"white", stroke:"none"});
     this.gfx.x = (options.x != undefined) ? options.x : this.gfx.x;
     this.gfx.y = (options.y != undefined) ? options.y : this.gfx.y;
     this.gfx.zIndex = options.userMade?8:0;
@@ -133,9 +133,9 @@ function Block(options) {
     this.hitFuncs = [];
     this.hit = function(dx, dy){ for(var i=0; i < this.hitFuncs.length; ++i) { this.hitFuncs[i](dx,dy); } };
     if(this.hp != 0) {
-        this.hitFuncs.push(function(dx, dy) { if(this.hp == 1) this.remove(); else if(this.hp > 0) this.hp--; });
+        this.hitFuncs.push(function(dx, dy) { if(self.hp == 1) self.remove(); else if(self.hp > 0) self.hp--; });
     } else if(this.mobile) {
-        this.hitFuncs.push(function(dx, dy) { this.gfx.x += dx; this.gfx.y += dy; });
+        this.hitFuncs.push(function(dx, dy) { self.gfx.x += dx; self.gfx.y += dy; self.gfx.needMatrixUpdate = true; });
     }
 
     canvas.append(this.gfx);

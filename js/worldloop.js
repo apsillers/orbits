@@ -22,7 +22,7 @@ function worldLoop() {
             if(w != s && w.power > 0 && !s.userMade) {
                 var vect = distVector(w.gfx, s.gfx, true);
                 var dist = Math.max(vect.r, w.gfx.radius);
-                var strength = w.power / POWER_PER_RADIUS / (dist*dist) / POWER_ADJUST_FACTOR;
+                var strength = w.power / POWER_PER_RADIUS / Math.pow(dist,1.5) / POWER_ADJUST_FACTOR;
                 
                 var ddx = strength * (vect.x);
                 var ddy = strength * (vect.y);
@@ -90,6 +90,7 @@ function worldLoop() {
             }
         }
         
+        s.gfx.needMatrixUpdate = true;
     }
     
     // if making a new well, increase the size of the placeholder

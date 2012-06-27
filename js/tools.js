@@ -64,6 +64,8 @@ function initTools() {
             var rot = deltaX>0?Math.atan(deltaY/deltaX)-Math.PI:Math.atan(deltaY/deltaX);
             if(deltaX==0) { rot *= -1; }
             newEmitter.rotation = [rot,0,0];
+            newEmitter.needMatrixUpdate = true;
+            console.log("sup", newEmitter.rotation)
         }
         if(newBlock) {
             newBlock.width = offsetX - newBlock.x ;

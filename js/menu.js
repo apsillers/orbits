@@ -16,6 +16,10 @@ $(function() {
     $("#blocks-tab").click(showTabFunc("blocks"));
     $("#help-tab").click(showTabFunc("help"));
 
+    $(document).keypress(function(e) {
+        console.log(e);
+    });
+
     $("#tool-save").on("click", function() {
         var name = $("#tool-name").val();
         var properties = propertiesFromTool(true);
