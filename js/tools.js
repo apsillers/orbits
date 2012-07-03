@@ -105,7 +105,9 @@ function initTools() {
         } else if(currentTool == "blocks") {
             if(newBlock) {
                 newBlock.opacity = 1;
-                new Block({ gfx:newBlock, color:"gray" });
+                new Block({ gfx:newBlock, color:"gray",
+                            mobile:$("#blocks-mobile").attr("checked")=="checked",
+                            hp:$("#blocks-destructable").attr("checked") ? $("#blocks-hp").val() : 0 });
                 newBlock = null;
             } else if(newBlockTimeout != null) {
                 clearTimeout(newBlockTimeout);

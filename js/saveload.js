@@ -49,7 +49,8 @@ function saveState() {
             y: b.gfx.y,
             width: b.gfx.width,
             height: b.gfx.height,
-            hp: b.hp
+            hp: b.hp,
+            mobile: b.mobile
         });
     }
 
@@ -66,7 +67,6 @@ function loadState(state) {
 
     for(var i=0, l=state.targets.length; i<l; ++i) {
          new Target(state.targets[i]);
-         console.log(state.targets[i]);
     }
 
     for(var i=0, l=state.emitters.length; i<l; ++i) {

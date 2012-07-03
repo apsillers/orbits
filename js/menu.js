@@ -16,10 +16,6 @@ $(function() {
     $("#blocks-tab").click(showTabFunc("blocks"));
     $("#help-tab").click(showTabFunc("help"));
 
-    $(document).keypress(function(e) {
-        console.log(e);
-    });
-
     $("#tool-save").on("click", function() {
         var name = $("#tool-name").val();
         var properties = propertiesFromTool(true);
@@ -31,6 +27,14 @@ $(function() {
        var properties = types[name];
        addTargetToList(name, properties);
     }
+
+    $("#blocks-destructable").click(function() {
+        if($(this).attr("checked")) {
+            $("#blocks-hp").attr("disabled",null);
+        } else {
+            $("#blocks-hp").attr("disabled","disabled");
+        }
+    });
 });
 
 /* return a properties object from  */

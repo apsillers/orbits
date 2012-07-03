@@ -46,7 +46,10 @@ function Target(options) {
     this.gfx = options.gfx || new Circle(options.radius || 25,
                                         {fill:options.color, x:options.x,
                                                              y:options.y});
-    this.gfx.appendChild(new TextNode(options.text, {fill:"black", font:"bold 8pt Arial", textAlign:"center", y:4}));
+    this.text = new TextNode(options.text, {fill:"black", font:"bold 8pt Arial", textAlign:"center", y:4});
+    this.gfx.appendChild(this.text);
+    this.text.__defineSetter__("underCursor", function(t) { self.underCursor = t; });
+    this.text.__defineGetter__("underCursor", function() { return self.underCursor; });
     canvas.append(this.gfx);
     this.gfx.zIndex = 5;
     this.text = options.text;

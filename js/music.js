@@ -1,6 +1,6 @@
 function addPlayButton(canvas) {
-    var mutebutton = new CanvasNode({fill:"white", x:canvas.width-25, y:25, opacity:0.4, zIndex:-1000});
-    mutebutton.append(new Polygon([-5,-5, -5,5, 0,5, 5,10, 5,-10, 0,-5]));
+    mutebutton = new CanvasNode({fill:"white", x:canvas.width-25, y:25, opacity:0.4, zIndex:-1000});
+    mutebutton.append(new Polygon([-5,-5, -5,5, 0,5, 5,10, 5,-10, 0,-5], {fill: "white"}));
 
     var nosound = new CanvasNode();
     nosound.append(new Circle(15, {fill:"none", stroke:"white", strokeWidth:2}))

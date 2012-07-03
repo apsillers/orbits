@@ -3,15 +3,25 @@ function doBounces(shot, blocks, canvas_height, canvas_width) {
         hasBounced = false;
     for(var j=0; j < blocks.length; ++j) {
         var block = blocks[j];
+        var ex = s.dx + s.gfx.x,
+            ey = s.dy + s.gfx.y;
+
         // if the shot would be inside this block at the end of the move, bounce it
-        if((s.dx + s.gfx.x > block.gfx.x && s.dx + s.gfx.x < block.gfx.x +  block.gfx.width &&
-            s.dy + s.gfx.y > block.gfx.y && s.dy + s.gfx.y < block.gfx.y +  block.gfx.height) ||
-           (s.gfx.x < block.gfx.x && s.gfx.x + s.dx> block.gfx.x &&
-            s.gfx.y > block.gfx.y && s.gfx.y < block.y + block.gfx.height &&
-            s.gfx.y + s.dy > block.gfx.y && s.gfx.y + s.dy < block.y + block.gfx.height) ||
-           (s.gfx.y < block.gfx.y && s.gfx.y + s.dy > block.gfx.y &&
-            s.gfx.x > block.gfx.x && s.gfx.x < block.x + block.gfx.width &&
-            s.gfx.x + s.dx > block.gfx.x && s.gfx.x + s.dx < block.x + block.gfx.width)) {
+        if((ex > block.gfx.x && ex < block.gfx.x + block.gfx.width &&
+            ey > block.gfx.y && ey < block.gfx.y + block.gfx.height) ||
+
+           // or if the shot started to the left or right, would go past the nearest side, and stays strictly within the y boundaries of the block
+           (((s.gfx.x <= block.gfx.x && ex >= block.gfx.x) ||
+             (s.gfx.x >= block.gfx.x + block.gfx.width && ex <= block.gfx.x + block.gfx.width)) &&
+            (s.gfx.y >= block.gfx.y && s.gfx.y <= block.gfx.y + block.gfx.height &&
+             ey      >= block.gfx.y && ey      <= block.gfx.y + block.gfx.height)) ||
+
+           // or if the shot started above or below, would go past the nearest side, and stays strictly within the x boundaries of the block
+           (((s.gfx.y <= block.gfx.y && ey >= block.gfx.y) ||
+             (s.gfx.y >= block.gfx.y + block.gfx.height && ey <= block.gfx.y + block.gfx.height)) &&
+            (s.gfx.x >= block.gfx.x && s.gfx.x <= block.gfx.x + block.gfx.width &&
+             ex >= block.gfx.x && ex <= block.gfx.x + block.gfx.width))) {
+
             // check if it started the move from the left or right, top or bottom
             var started_left = s.gfx.x <= block.gfx.x + block.gfx.width/2;
             var started_above = s.gfx.y <= block.gfx.y + block.gfx.height/2;
@@ -82,7 +92,7 @@ function doBounces(shot, blocks, canvas_height, canvas_width) {
         s.gfx.y += s.dy;
     }
 
-    // if the shot is still out of bounds after the bounce, give up
+    // if the shot is still out of bounds after the bounce, give up: it has moved away further than the length of the arena
     if(s.dx + s.gfx.x > canvas_width || s.dx + s.gfx.x < 0 || s.dy + s.gfx.y > canvas_height || s.dy + s.gfx.y < 0) {
         return false;
     }

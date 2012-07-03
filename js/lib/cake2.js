@@ -4045,44 +4045,83 @@ CanvasNode.prototype = {
     if (this.visibility)
       this.drawable = (this.visibility != 'hidden')
     this.underCursor = false
+
+	//this.transform(null, true)
+
     if (this.visible && this.catchMouse && this.root.absoluteMouseX != null) {
-      ctx.save()
-      this.transform(ctx, true)
-      if (this.pickable && this.drawable) {
-        if (ctx.isPointInPath) {
-          ctx.beginPath()
-          if (this.drawPickingPath)
-            this.drawPickingPath(ctx)
-        }
-        this.underCursor = CanvasSupport.isPointInPath(
-                              this.drawPickingPath ? ctx : false,
-                              this.root.mouseX,
-                              this.root.mouseY,
-                              this.currentMatrix,
-                              this)
-        if (this.underCursor)
-          this.root.target = this
+	  var bbskip = false;
+	  var skip = false;
+	  
+      
+      //TODO: this makes this slower...
+      /*var bb = this.getAxisAlignedBoundingBox();	  
+	  if(bb) {
+        var x_out = this.root.mouseX < bb[0] || this.root.mouseX > (bb[0] + bb[2]);
+        var y_out = this.root.mouseY < bb[1] || this.root.mouseY > (bb[1] + bb[3]);
+        
+        bbskip = x_out || y_out;
+	  }*/
+		
+	  if( this.mask  ) {
+			var bb = this.transformBoundingBoxBy(this.mask, this.currentMatrix);
+			
+			if( this.root.mouseX < bb[0] || this.root.mouseX > (bb[0] + bb[2]) 
+				|| this.root.mouseY < bb[1] || this.root.mouseY > (bb[1] + bb[3]) )
+				skip = true;
+	  }
+			
+      if (this.pickable && (this.drawable || this.bmpCache) && !skip && !bbskip) {
+      	//ctx.save()
+      	this.transform(ctx, true)
+	    if (ctx.isPointInPath) {
+	      ctx.beginPath();
+	      if(this.bmpCache) {
+	      	var bb = this.bmpCache.bmpBoundingBox;
+			var point = CanvasSupport.tMatrixMultiplyPoint(this.currentMatrix, 0, 0);
+	       		
+	        ctx.setTransform(1,0,0,1,0,0);
+	        ctx.rect(point[0] + bb[0], 
+	       		point[1] + bb[1], (bb[2]), (bb[3]));
+	      } else if (this.drawPickingPath)
+	        this.drawPickingPath(ctx)
+	    }
+	    this.underCursor = CanvasSupport.isPointInPath(
+	                          this.drawPickingPath ? ctx : false,
+	                          this.root.mouseX,
+	                          this.root.mouseY,
+	                          !this.bmpCache ? this.currentMatrix : [1,0,0,1,0,0],
+	                          this)
+	    if (this.underCursor) {
+	      this.root.pickStack.unshift(this);
+	      this.root.target = this;
+	    }
+	    //ctx.restore();
       } else {
         this.underCursor = false
       }
-      var c = this.__getChildrenCopy()
-      this.__zSort(c)
-      for(var i=0; i<c.length; i++) {
-        c[i].handlePick(ctx)
-        if (!this.underCursor)
-          this.underCursor = c[i].underCursor
-      }
-      ctx.restore()
-    } else {
-      var c = this.__getChildrenCopy()
+	  if( !skip && !this.pickIgnoreChildren && this.visible) {
+      	  var c = this.childNodes;//__getChildrenCopy()
+	      //this.__zSort(c)
+	      for(var i=0; i<c.length; i++) {
+	        c[i].handlePick(ctx)
+	        if (!this.underCursor)
+	          this.underCursor = c[i].underCursor
+	      }
+	  }
+      
+    } else if( !this.pickIgnoreChildren && this.visible ) {
+      /*var c = this.__getChildrenCopy()
       while (c.length > 0) {
         var c0 = c.pop()
         if (c0.underCursor) {
           c0.underCursor = false
           Array.prototype.push.apply(c, c0.childNodes)
         }
-      }
+      }*/
+      //TODO: undercursor does what?
     }
+    
+    //if(this.root.target!=null) console.log(this.root.target, this.root.dragTarget);
   },
 
   __zSort : function(c) {
@@ -4810,6 +4849,7 @@ Canvas.prototype = {
 
     this.canvas.parentNode.addEventListener('mousedown', function(e) {
       th.mouseDown = true
+      console.log("mousedown on", th.target);
       if (th.keyTarget != th.target) {
         if (th.keyTarget)
           th.dispatchEvent({type: 'blur', canvasTarget: th.keyTarget})
@@ -4858,7 +4898,7 @@ Canvas.prototype = {
         this.addMouseEvent(nev)
         th.dispatchEvent(nev);
       }
-      
+
       if (th.dragTarget) {
         var nev = document.createEvent('MouseEvents')
         nev.initMouseEvent('drag', true, true, window, e.detail,
