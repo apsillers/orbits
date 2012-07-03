@@ -9,7 +9,7 @@ POWER_PER_SHOT = 30; // power gained when consuming a shot
 POWER_ADJUST_FACTOR = 0.09; // tweaks how powerful wells are
 ATROPHY_RATE = 0.5; // decrease in power per cycle of non-static wells
 BASE_WELL_SIZE = 5; // minimum size of a new well
-MAX_SHOTS = 10;
+MAX_SHOTS = 100;
 WORLD_PERIOD = 7;
 SHOT_RATE = WORLD_PERIOD*71; // how often emitters fire shots
 BASE_SHOT_SPEED = 1.5; // how fast shots move normally
@@ -35,21 +35,6 @@ function init() {
         } while(timeDiff >= WORLD_PERIOD);
         lastTime = +new Date();
     }, WORLD_PERIOD);
-    
-    // emitters fire periodically
-    shotInt = setInterval(function() {
-        for(var i = 0; i < emitters.length; ++i) {
-            var emitr = emitters[i];
-            if(shots.length < MAX_SHOTS) {
-                new Well({
-                    x:emitr.gfx.x, y:emitr.gfx.y,
-                    power:0, radius:2, static: true,
-                    consuming:false,
-                    dx:emitr.shotDx, dy:emitr.shotDy,
-                    color:"white"});
-            }
-        }
-    }, SHOT_RATE);
 
     addPlayButton(canvas);
 

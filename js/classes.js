@@ -5,6 +5,27 @@ function Emitter(options) {
     this.gfx.y = options.y;
     this.gfx.fill = options.color || "purple";
     this.gfx.zIndex = 20;
+    this.shotPeriod = options.shotPeriod || SHOT_RATE;
+    this.shotCountdown = this.shotPeriod;
+
+    this.doShotCountdown = function() {
+        self.shotCountdown -= WORLD_PERIOD;
+        if(self.shotCountdown <= 0) {
+            self.shotCountdown = self.shotPeriod + self.shotCountdown;
+            self.shoot();
+        }
+    }
+
+    this.shoot = function() {
+        if(shots.length < MAX_SHOTS) {
+            new Well({
+                x:self.gfx.x, y:self.gfx.y,
+                power:0, radius:2, static: true,
+                consuming:false,
+                dx:self.shotDx, dy:self.shotDy,
+                color:"white"});
+        }
+    }
 
     if(typeof options.rotation != "undefined") {
         var rot = options.rotation instanceof Array ? options.rotation[0] : options.rotation;

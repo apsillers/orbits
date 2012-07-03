@@ -1,3 +1,7 @@
+canvas {
+    cursor: pointer;
+}
+
 .target-item {
     padding: 2px;
     background-color: #55F;
@@ -55,4 +59,8 @@ body {
 #menu-body {
     height: 490px;
     overflow-y: auto;
+}
+
+#blocks-hp {
+    margin-left: 25px;
 }

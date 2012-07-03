@@ -1,6 +1,6 @@
 function worldLoop() {
     
-    // move emitters
+    // move emitters (deprecated -- emitters are not mobile)
     for(var i=0; i< emitters.length; ++i) {
         var p = emitters[i];
         var sum = Math.abs(p.dx) + Math.abs(p.dy);
@@ -8,6 +8,12 @@ function worldLoop() {
             p.gfx.x += p.speed * p.dx/sum;
             p.gfx.y += p.speed * p.dy/sum;
         }
+    }
+
+    // emitters fire periodically
+    for(var i = 0; i < emitters.length; ++i) {
+        var emitr = emitters[i];
+        emitr.doShotCountdown();
     }
     
     // handles shots
