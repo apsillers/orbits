@@ -6,6 +6,8 @@ function allowClick() {
     newBlockTimeout = null;
     clearTimeout(newEmitterTimeout);
     newEmitterTimeout = null;
+    clearTimeout(newTargetTimeout);
+    newTargetTimeout = null;
 }
 
 function distVector(obj1, obj2, log) {

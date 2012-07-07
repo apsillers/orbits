@@ -144,6 +144,7 @@ function Block(options) {
     this.gfx = options.gfx || new Rectangle(this.width, this.height);
     this.gfx.width = options.width || this.gfx.width || 50;
     this.gfx.height = options.height || this.gfx.height || 50;
+    this.gfx.rotation = options.rotation ? [options.rotation,0,0] : this.gfx.rotation;
     this.gfx.x = options.x || this.gfx.x;
     this.gfx.y = options.y || this.gfx.y;
 

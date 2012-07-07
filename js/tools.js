@@ -5,6 +5,7 @@ newEmitterTimeout = null;
 newBlock = null;
 newBlockTimeout = null;
 currentTool = null;
+newTargetTimeout = null;
 
 function initTools() {
     $(canvas.canvas).on("mousedown", function(e) {
@@ -15,8 +16,11 @@ function initTools() {
             return;
         }
         if(currentTool == "targets") {
-            new Target({color:$("#tool-color").val(), x:offsetX, y:offsetY, text:$("#tool-name").val(),
-                        properties:propertiesFromTool()});
+            newTargetTimeout = setTimeout(function() {
+                new Target({color:$("#tool-color").val(), x:offsetX, y:offsetY, text:$("#tool-name").val(),
+                            properties:propertiesFromTool()});
+                newTargetTimeout = null;
+            }, 20);
         } else if(currentTool == "wells") {
             // create newWell placeholder
             if(!newWell && !newWellTimeout) {

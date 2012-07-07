@@ -40,7 +40,7 @@ function init() {
 
     if(window.location.hash) {
         try {
-            loadState(atob(window.location.hash.substr(1)));
+            saveLoad.loadState(atob(window.location.hash.substr(1)));
         } catch(e) {
            setupCourse(); 
         }
@@ -56,7 +56,10 @@ function setupCourse() {
     new Target({color:"yellow", x:600, y:400, text:"HiGr", properties:{gravReaction:4, edible:false}});
     new Target({color:"#F55", x:400, y:300, text:"MkGr",  properties:{gravPull:60, radius:3}, radius:27});
 
-    new Block({color:"#AAA", x:600, y:525, mobile:true});
+    new Block({color:"#AAA", x:300, y:525, rotation: Math.PI/4 });
+    new Block({color:"#AAA", x:300, y:525, rotation: Math.PI/4 });
+    new Block({color:"#AAA", x:300, y:525, rotation: Math.PI/4 });
+    new Block({color:"#AAA", x:300, y:525, rotation: Math.PI/4 });
     new Block({color:"#A00", x:200, y:325});
 
     new Emitter({ rotation:0, x:50, y:550 });
