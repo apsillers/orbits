@@ -112,6 +112,6 @@ $(function() {
 
     $("#state-sample").on("click", function() {
         saveLoad.clearEverything();
-        saveLoad.loadState('{"shots":[{"static":true,"userMade":true,"power":600,"consuming":true,"x":419,"y":275,"radius":40}],"targets":[{"color":"#0ff","x":321,"y":315,"text":"Faster","properties":{"gravReaction":"4","smallSpeedup":"1","smallSlowdown":"1","gravPull":"0","speedFactor":"5","radius":"2","edible":true}},{"color":"#ff0","x":525,"y":325,"text":"Slower","properties":{"gravReaction":"2","smallSpeedup":"1","smallSlowdown":"1","gravPull":"0","speedFactor":"3","radius":"2","edible":true}}],"emitters":[{"color":"purple","x":462,"y":356,"rotation":[0,0,0]},{"color":"purple","x":365,"y":346,"rotation":[-3.141592653589793,0,0]}],"blocks":[]}');
+        saveLoad.loadState('{"shots":[{"static":true,"userMade":true,"power":141.42368567424268,"consuming":true,"x":403,"y":279,"radius":9.428245711616178}],"targets":[{"color":"#0ff","x":305,"y":241,"text":"Faster","properties":{"gravReaction":"4","smallSpeedup":"1","smallSlowdown":"1","gravPull":"0","speedFactor":"5","radius":"2","edible":true}},{"color":"#ff0","x":513,"y":323,"text":"Slower","properties":{"gravReaction":"2","smallSpeedup":"1","smallSlowdown":"1","gravPull":"0","speedFactor":"3","radius":"2","edible":true}}],"emitters":[{"color":"purple","x":462,"y":356,"rotation":[0,0,0]},{"color":"purple","x":344,"y":280,"rotation":[-3.141592653589793,0,0]}],"blocks":[]}');
     });
 });
