@@ -34,7 +34,7 @@ function addPlayButton(canvas) {
     var music = $("#music")[0];
     music.addEventListener("ended", function() {
         trackIndex = (trackIndex+1) % trackList.length;
-        var trackName = "/media/" + trackList[trackIndex];
+        var trackName = "media/" + trackList[trackIndex];
     
         while(music.firstChild) { music.removeChild(music.firstChild); }
 
