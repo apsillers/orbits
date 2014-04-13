@@ -27,4 +27,23 @@ function addPlayButton(canvas) {
     });
     mutebutton.append(nosound);
     canvas.append(mutebutton);
+
+    var trackList = ["lunar", "h2o", "lullaby"];
+    var trackIndex = 0;
+
+    var music = $("#music")[0];
+    music.addEventListener("ended", function() {
+        trackIndex = (trackIndex+1) % trackList.length;
+        var trackName = "/media/" + trackList[trackIndex];
+    
+        while(music.firstChild) { music.removeChild(music.firstChild); }
+
+        if(music.canPlayType('audio/mpeg') == "probably") {
+            music.src = trackName+".mp3";    
+        } else if(music.canPlayType('audio/ogg; codecs="vorbis"') == "probably") {
+            music.src = trackName+".ogg";
+        }
+
+        music.play();
+    });
 }
