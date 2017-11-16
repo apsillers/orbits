@@ -1,5 +1,5 @@
 function addPlayButton(canvas) {
-    mutebutton = new CanvasNode({fill:"white", x:canvas.width-25, y:25, opacity:0.4, zIndex:-1000});
+/*    mutebutton = new CanvasNode({fill:"white", x:canvas.width-25, y:25, opacity:0.4, zIndex:-1000});
     mutebutton.append(new Polygon([-5,-5, -5,5, 0,5, 5,10, 5,-10, 0,-5], {fill: "white"}));
 
     var nosound = new CanvasNode();
@@ -27,7 +27,7 @@ function addPlayButton(canvas) {
     });
     mutebutton.append(nosound);
     canvas.append(mutebutton);
-
+*/
     var trackList = ["lunar", "h2o", "lullaby"];
     var trackIndex = 0;
 

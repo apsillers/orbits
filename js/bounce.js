@@ -61,13 +61,13 @@ LinAlg = {
             sy = shot.gfx.y,
             ex = shot.gfx.x + shot.dx,
             ey = shot.gfx.y + shot.dy,
-            rot = box.gfx.rotation instanceof Array ? -box.gfx.rotation[0] : -(box.gfx.rotation || 0);
+            rot = box.gfx.rotation*Math.PI/180 || 0;
 
         var b = [];
         b[0] = {x:box.gfx.x, y:box.gfx.y},
-        b[1] = {x:b[0].x + box.gfx.width * Math.cos(rot), y:b[0].y - box.gfx.width * Math.sin(rot)},
-        b[2] = {x:b[1].x + box.gfx.height * Math.sin(rot), y:b[1].y + box.gfx.height * Math.cos(rot)},
-        b[3] = {x:b[2].x - box.gfx.width * Math.cos(rot), y:b[2].y + box.gfx.width * Math.sin(rot)};
+        b[1] = {x:b[0].x + box.width * Math.cos(rot), y:b[0].y - box.width * Math.sin(rot)},
+        b[2] = {x:b[1].x + box.height * Math.sin(rot), y:b[1].y + box.height * Math.cos(rot)},
+        b[3] = {x:b[2].x - box.width * Math.cos(rot), y:b[2].y + box.width * Math.sin(rot)};
 
         for(var i=0; i < 4; ++i) {
             var result = LinAlg.lineIntersect(sx, sy, ex, ey,

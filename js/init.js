@@ -1,3 +1,7 @@
+window.onerror = function(a,b,c) {
+    alert(a + " " + b + " " + c);
+}
+
 var emitters = [];
 var shots = [];
 var targets = [];
@@ -19,7 +23,7 @@ LARGE_SPEED_INC = 0.8;
 window.onload = init;
 
 function init() {
-    canvas = new Canvas($("#canvas-div").get(0), 800, 600, {fill:"black"});
+    canvas = new createjs.Stage("canvas");
 
     $(canvas.canvas).on("contextmenu", function(e) { e.preventDefault(); })
 
@@ -56,11 +60,11 @@ function setupCourse() {
     new Target({color:"yellow", x:600, y:400, text:"HiGr", properties:{gravReaction:4, edible:false}});
     new Target({color:"#F55", x:400, y:300, text:"MkGr",  properties:{gravPull:60, radius:3}, radius:27});
 
-    new Block({color:"#AAA", x:300, y:525, rotation: Math.PI/4 });
+/*    new Block({color:"#AAA", x:300, y:525, rotation: Math.PI/4 });
     new Block({color:"#AAA", x:300, y:525, rotation: Math.PI/4 });
     new Block({color:"#AAA", x:300, y:525, rotation: Math.PI/4 });
     new Block({color:"#AAA", x:300, y:525, rotation: Math.PI/4 });
     new Block({color:"#A00", x:200, y:325});
-
+*/
     new Emitter({ rotation:0, x:50, y:550 });
 }

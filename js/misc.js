@@ -20,10 +20,11 @@ function distVector(obj1, obj2, log) {
 }
 
 // clean up when cake skips removals
-setInterval(function() {
+/*setInterval(function() {
     for(var i = 0; i < canvas.childNodes.length; ++i) {
         if(canvas.childNodes[i].erased == true) {
             canvas.remove(canvas.childNodes[i]);
         }
     }
 }, 5000);
+*/

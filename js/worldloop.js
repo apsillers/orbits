@@ -19,6 +19,8 @@ function worldLoop() {
     // handles shots
     for(var i=0; i< shots.length; ++i) {
         var s = shots[i];
+
+	alert(s.gfx.x + "," + s.gfx.y + "," + s.fill)
         
         // acceleration due to gravity wells
         for(var j=0; j < shots.length; ++j) {
@@ -73,8 +75,9 @@ function worldLoop() {
         if(s.power > 0 && !s.static) {
             if(!s.protected && (s.power-=ATROPHY_RATE) <= 0) s.remove();
             else {
-                s.gfx.radius = s.power / POWER_PER_RADIUS;
-                if(self.userMade && s.power < POPPING_POWER) s.gfx.removeAllChildren(); //remove message
+                s.radius = s.power / POWER_PER_RADIUS;
+                //if(self.userMade && s.power < POPPING_POWER) s.gfx.removeAllChildren(); //remove message
+                s.redraw();
             }
         }
 
@@ -84,21 +87,22 @@ function worldLoop() {
             var vect = distVector(t.gfx, s.gfx);
             
             if(vect.r < t.gfx.radius + s.gfx.radius && !s.userMade) {
-                s.gfx.fill = t.gfx.fill;
+                s.fill = t.fill;
 
                 s.gravReaction = parseInt(t.properties.gravReaction || 1);
                 s.baseSpeed = BASE_SHOT_SPEED * (t.properties.speedFactor || 1);
                 s.power = parseInt(t.properties.gravPull || 0);
-                s.gfx.radius = parseInt(t.properties.radius || 2);
+                s.radius = parseInt(t.properties.radius || 2);
                 s.edible = (typeof t.properties.edible != "undefined") ? t.properties.edible : true;
                 s.smallSlowdown = parseInt((t.properties.smallSlowdown || 1) * SMALL_SPEED_INC);
                 s.smallSpeedup = parseInt((t.properties.smallSpeedup || 1) * SMALL_SPEED_INC);
             }
         }
-        
-        s.gfx.needMatrixUpdate = true;
+	s.redraw();        
     }
     
     // if making a new well, increase the size of the placeholder
     if(newWell) newWell.radius = Math.min(newWell.radius+newWell.radius/20, 40);
+
+    canvas.update();
 }
